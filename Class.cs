@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.IO;
+using System.Xml.Serialization;
+using Newtonsoft.Json;
 
 public class Telefon
 {
@@ -11,7 +14,7 @@ public class Telefon
     public string Descriere { get; set; }
     public int Stoc { get; set; }
 
-    public Telefon(int id, string brand, string model, decimal pret, string descriere, int stoc)
+    public Telefon(int id, string brand, string model, decimal pret, string descriere, int stoc)//constructor al clasei telefon
     {
         Id = id;
         Brandul = brand;
@@ -88,11 +91,28 @@ public class MagazinulDeTelefoaneMobile
     public void Adauga_Telefon(Telefon telefon)
     {
         telefoane.Add(telefon);
+
+        // Open the file in append mode
+        using (StreamWriter file = new StreamWriter("telefoane.txt", true))
+        {
+            // Write the phone data to the file
+            file.WriteLine($"{telefon.Id}, {telefon.Brandul}, {telefon.Model}, {telefon.Pret}, {telefon.Descriere}, {telefon.Stoc}");
+        }
     }
+
 
     public void Adauga_Client(Client client)
     {
         clienti.Add(client);
+
+        // Serialize the list of clients to a file
+        using (StreamWriter file = new StreamWriter("clienti.txt"))
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            serializer.Serialize(file, clienti);
+        }
+
+        Console.WriteLine("Client adaugat cu succes!");
     }
 
     public void PlaceOrder(Client client, Comanda comanda)
@@ -108,6 +128,50 @@ public class MagazinulDeTelefoaneMobile
             produs.Phone.Stoc -= produs.Cantitate;
         }
     }
+    public Client Cauta_Client(string email)
+    {
+        foreach (var client in clienti)
+        {
+            if (client.Email == email)
+            {
+                Console.WriteLine($"Clientul {client.Nume} are urmatoarele comenzi:");
+
+                foreach (var comanda in client.Comenzi)
+                {
+                    Console.WriteLine($"ID-ul comenzii: {comanda.Id}, \nData comenzii: {comanda.Data_comenzii}, \nAdresa: {comanda.Adresa}");
+                }
+
+                return client;
+            }
+        }
+
+        Console.WriteLine($"\nNu s-a gasit niciun client cu adresa de email {email}.");
+        return null;
+    }
+
+
+    public void Sterge_Client(Client Sterge)
+    {
+        
+        Client client = Cauta_Client(Sterge.Email);
+        if (client != null)
+        {
+            clienti.Remove(client);
+
+            // Serialize the updated list of clients to a file
+            string json = JsonConvert.SerializeObject(clienti, Formatting.Indented);
+            File.WriteAllText("clienti.json", json);
+
+            Console.WriteLine($"Clientul cu adresa de email {Sterge.Email} a fost sters cu succes.");
+        }
+        else
+        {
+            Console.WriteLine($"Nu s-a gasit niciun client cu adresa de email {Sterge.Email}.");
+        }
+    }
+
+
+
 
     public List<Telefon> GetTelefoane()
     {
@@ -123,4 +187,5 @@ public class MagazinulDeTelefoaneMobile
     {
         return comenzi;
     }
+  
 }
