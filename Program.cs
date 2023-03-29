@@ -1,33 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 class Program
 {
     static void Main(string[] args)
     {
         MagazinulDeTelefoaneMobile shop = new MagazinulDeTelefoaneMobile();
-         
-
-        // Adding phones to the shop
-        Telefon phone1 = new Telefon(1, "Apple", "iPhone 12", 799.99m, "The iPhone 12 features a 6.1-inch Super Retina XDR display and A14 Bionic chip.", 10);
-        Telefon phone2 = new Telefon(2, "Samsung", "Galaxy S21", 699.99m, "The Galaxy S21 features a 6.2-inch Dynamic AMOLED 2X display and Exynos 2100 chip.", 8);
-        Telefon phone3 = new Telefon(3, "Google", "Pixel 5", 699.99m, "The Pixel 5 features a 6-inch OLED display and Snapdragon 765G chip.", 5);
-        shop.Adauga_Telefon(phone1);
-        shop.Adauga_Telefon(phone2);
-        shop.Adauga_Telefon(phone3);
-
-        // Adding customers to the shop
-        Client customer1 = new Client("John Smith", "john.smith@example.com", "123 Main St, Anytown USA");
-        Client customer2 = new Client("Jane Doe", "jane.doe@example.com", "456 Oak Ave, Anytown USA");
-        shop.Adauga_Client(customer1);
-        shop.Adauga_Client(customer2);
-
-        // Placing an order
-        comandaprodus orderItem1 = new comandaprodus(phone1, 2);
-        comandaprodus orderItem2 = new comandaprodus(phone2, 1);
-     
-        Comanda order = new Comanda(new List<comandaprodus> { orderItem1, orderItem2 }, "789 Elm St, Anytown USA");
-        shop.PlaceOrder(customer1, order);
+    
         while (true)
         {
             Console.WriteLine("1. Afiseaza toate telefoanele");
@@ -77,18 +58,7 @@ class Program
                     // Find the customer based on the entered email
                     Client customer = shop.Cauta_Client(email);
 
-                    if (customer != null)
-                    {
-                        Console.WriteLine($"Comenzi ale clientului {customer.Nume}:");
-                        foreach (var customerOrder in customer.Comenzi)
-                        {
-                            Console.WriteLine($"ID-ul comenzii: {customerOrder.Id}, \nData comenzii: {customerOrder.Data_comenzii}, \nPret Total: ${customerOrder.prettotal}");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Nu exista client cu adresa de email {email}");
-                    }
+                    
                     break;
                 case "3":
                     Console.Write("Introduceti ID-ul telefonului: ");
@@ -116,10 +86,61 @@ class Program
                     Console.WriteLine($"Telefonul {newPhone.Brandul} {newPhone.Model} a fost adaugat cu succes.");
                     break;
                 case "4":
-                    // TODO: Implement code to place an order
+                    Console.Write("Introduceti adresa de email a clientului: ");
+                    string customerEmail = Console.ReadLine();
+
+                    // Search for the customer
+                    Client client = shop.Cauta_Client(customerEmail);
+                    if (client == null)
+                    {
+                        Console.WriteLine($"Nu s-a gasit niciun client cu adresa de email {customerEmail}.");
+                        break;
+                    }
+
+                    // Display the available phones
+                    List<Telefon> pTelefon = shop.GetTelefoane();
+                    Console.WriteLine("ID  | Brand  | Model  | Pret  | Descriere  | Stoc");
+                    foreach (Telefon phone in pTelefon)
+                    {
+                        Console.WriteLine($"{phone.Id}  | {phone.Brandul}  | {phone.Model}  | {phone.Pret}  | {phone.Descriere}  | {phone.Stoc}");
+                    }
+
+                    // Prompt the user to enter the phone ID and quantity
+                    Console.Write("Introduceti ID-ul telefonului: ");
+                    int phoneId = int.Parse(Console.ReadLine());
+                    Console.Write("Introduceti cantitatea: ");
+                    int quantity = int.Parse(Console.ReadLine());
+
+                    // Check if the requested phone is available
+                    Telefon selectedPhone = pTelefon.FirstOrDefault(p => p.Id == phoneId);
+                    if (selectedPhone == null)
+                    {
+                        Console.WriteLine($"Nu s-a gasit niciun telefon cu ID-ul {phoneId}.");
+                        break;
+                    }
+                    if (selectedPhone.Stoc < quantity)
+                    {
+                        Console.WriteLine($"Cantitatea solicitata nu este disponibila. Stoc curent: {selectedPhone.Stoc}.");
+                        break;
+                    }
+
+                    // Reduce the stock of the phone
+                    selectedPhone.Stoc -= quantity; 
+
+                    // Save the order in a text file
+                    string filePath = @"C:\Users\Asus\Desktop\clienti.txt";
+                    using (StreamWriter writer = new StreamWriter(filePath, true))
+                    {
+                        writer.WriteLine($"Comanda pentru {customerEmail}: {quantity} x {selectedPhone.Brandul} {selectedPhone.Model} la pretul de {selectedPhone.Pret} lei.");
+                    }
+
+                    Console.WriteLine($"Comanda a fost plasata cu succes pentru {quantity} x {selectedPhone.Brandul} {selectedPhone.Model} la pretul de {selectedPhone.Pret} lei.");
                     break;
+
+
+
                 case "5":
-                    // Add a new client to the shop
+                    // Adauga un nou client
                     Console.WriteLine("Introduceti numele clientului:");
                     string nume = Console.ReadLine();
 
@@ -131,8 +152,6 @@ class Program
 
                     Client newClient = new Client(nume, mailAdress, adresa);
                     shop.Adauga_Client(newClient);
-
-                    Console.WriteLine("Client adaugat cu succes!");
                     break;
                 case "6":
                     // Sterge un client
