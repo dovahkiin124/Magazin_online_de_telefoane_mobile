@@ -42,13 +42,7 @@ public class Comanda
     private static int comandaId = 1;
     public int Id { get; set; }
     public List<comandaprodus> Produse { get; set; }
-    public decimal prettotal
-    {
-        get
-        {
-            return Produse.Sum(item => item.Phone.Pret * item.Cantitate);
-        }
-    }
+   
     public string Adresa{ get; set; }
     public DateTime Data_comenzii { get; set; }
     public bool Livrata { get; set; }
@@ -93,61 +87,62 @@ public class MagazinulDeTelefoaneMobile
         telefoane.Add(telefon);
 
         // Open the file in append mode
-        using (StreamWriter file = new StreamWriter("telefoane.txt", true))
+        using (StreamWriter file = new StreamWriter("C:/Users/Asus/Desktop/telefoane.txt", true))
         {
             // Write the phone data to the file
             file.WriteLine($"{telefon.Id}, {telefon.Brandul}, {telefon.Model}, {telefon.Pret}, {telefon.Descriere}, {telefon.Stoc}");
         }
     }
 
+   
 
     public void Adauga_Client(Client client)
     {
         clienti.Add(client);
 
         // Serialize the list of clients to a file
-        using (StreamWriter file = new StreamWriter("clienti.txt"))
+        using (StreamWriter file = new StreamWriter("C:/Users/Asus/Desktop/clienti.txt"))
         {
-            JsonSerializer serializer = new JsonSerializer();
-            serializer.Serialize(file, clienti);
+            file.WriteLine($"{client.Nume}, {client.Email}, {client.Adresa}, {client.Comenzi}");
         }
 
         Console.WriteLine("Client adaugat cu succes!");
     }
 
-    public void PlaceOrder(Client client, Comanda comanda)
-    {
-        if (!clienti.Contains(client))
-        {
-            clienti.Add(client);
-        }
-        client.Comenzi.Add(comanda);
-        comenzi.Add(comanda);
-        foreach (var produs in comanda.Produse)
-        {
-            produs.Phone.Stoc -= produs.Cantitate;
-        }
-    }
+   
     public Client Cauta_Client(string email)
     {
-        foreach (var client in clienti)
+        using (StreamReader sr = new StreamReader(@"C:/Users/Asus/Desktop/clienti.txt"))
         {
-            if (client.Email == email)
+            while (!sr.EndOfStream)
             {
-                Console.WriteLine($"Clientul {client.Nume} are urmatoarele comenzi:");
+                string line = sr.ReadLine();
+                string[] fields = line.Split(',');
 
-                foreach (var comanda in client.Comenzi)
+                string nume = fields[0].Trim();
+                string emailFile = fields[1].Trim();
+                string adresa = fields[2].Trim();
+
+                if (emailFile == email)
                 {
-                    Console.WriteLine($"ID-ul comenzii: {comanda.Id}, \nData comenzii: {comanda.Data_comenzii}, \nAdresa: {comanda.Adresa}");
-                }
+                    Console.WriteLine($"Clientul {nume} are urmatoarele comenzi:");
 
-                return client;
+                    foreach (var comanda in comenzi)
+                    {
+                        Console.WriteLine($"ID-ul comenzii: {comanda.Id}, \nData comenzii: {comanda.Data_comenzii}, \nAdresa: {comanda.Adresa}");
+                    }
+
+                    return new Client(nume, email, adresa);
+                }
             }
         }
 
         Console.WriteLine($"\nNu s-a gasit niciun client cu adresa de email {email}.");
         return null;
     }
+
+
+
 
 
     public void Sterge_Client(Client Sterge)
@@ -175,8 +170,31 @@ public class MagazinulDeTelefoaneMobile
 
     public List<Telefon> GetTelefoane()
     {
+        List<Telefon> telefoane = new List<Telefon>();
+
+        using (StreamReader sr = new StreamReader(@"C:/Users/Asus/Desktop/telefoane.txt"))
+        {
+            while (!sr.EndOfStream)
+            {
+                string line = sr.ReadLine();
+                string[] fields = line.Split(',');
+
+                int id = int.Parse(fields[0].Trim());
+                string brand = fields[1].Trim();
+                string model = fields[2].Trim();
+                decimal pret = decimal.Parse(fields[3].Trim());
+                string descriere = fields[4].Trim();
+                int stoc = int.Parse(fields[5].Trim());
+
+                Telefon telefon = new Telefon(id, brand, model, pret, descriere, stoc);
+                telefoane.Add(telefon);
+            }
+        }
+
         return telefoane;
     }
+
+   
 
     public List<Client> GetClienti()
     {
