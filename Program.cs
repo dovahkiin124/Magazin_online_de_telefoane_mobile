@@ -11,15 +11,20 @@ class Program
     
         while (true)
         {
-            Console.WriteLine("1. Afiseaza toate telefoanele");
-            Console.WriteLine("2. Afiseaza toate comenzile unui client");
-            Console.WriteLine("3. Adauga un telefon");
-            Console.WriteLine("4. Plaseaza o comanda");
-            Console.WriteLine("5. Adauga un client");
-            Console.WriteLine("6. Sterge un client");
-            Console.WriteLine("0. Iesire");
-
-            Console.WriteLine("Introdu comanda:");
+            Console.WriteLine("__________________________________________");
+            Console.WriteLine("|             MENIUL PRINCIPAL           |");
+            Console.WriteLine("|________________________________________|");
+            Console.WriteLine("|1_Afiseaza toate telefoanele            |");
+            Console.WriteLine("|2_Afiseaza toate comenzile unui client  |");
+            Console.WriteLine("|3_Adauga un telefon                     |");
+            Console.WriteLine("|4_Plaseaza o comanda                    |");
+            Console.WriteLine("|5_Adauga un client                      |");
+            Console.WriteLine("|6_Sterge un client                      |");
+            Console.WriteLine("|0_Iesire                                |");
+            Console.WriteLine("|________________________________________|");
+            Console.WriteLine("__________________");
+            Console.WriteLine("|Introdu comanda:|");
+            Console.WriteLine("------------------");
             string choice = Console.ReadLine();
             Console.Clear();
 
@@ -28,20 +33,20 @@ class Program
                 
 
                 case "1":
-                    // Get all phones from the shop
+                    // Preia toate datele din fisierul telefoane.txt
                     List<Telefon> phones = shop.GetTelefoane();
 
-                    // Check if there are any phones in the shop
+                    // Vede daca sunt telefoane in magazin
                     if (phones.Count == 0)
                     {
                         Console.WriteLine("Nu exista telefoane in magazin.");
                     }
                     else
                     {
-                        // Display each phone
+                        // Afiseaza fiecare telefon
                         foreach (Telefon phone in phones)
                         {
-                            Console.WriteLine($"ID: {phone.Id}");
+                            
                             Console.WriteLine($"Brand: {phone.Brandul}");
                             Console.WriteLine($"Model: {phone.Model}");
                             Console.WriteLine($"Pret: {phone.Pret}");
@@ -55,14 +60,12 @@ class Program
                 case "2":
                     Console.Write("Introduceti adresa de email a clientului: ");
                     string email = Console.ReadLine();
-                    // Find the customer based on the entered email
+                    // Gaseste clientul bazat pe adresa de email
                     Client customer = shop.Cauta_Client(email);
 
                     
                     break;
                 case "3":
-                    Console.Write("Introduceti ID-ul telefonului: ");
-                    int id = int.Parse(Console.ReadLine());
 
                     Console.Write("Introduceti brandul telefonului: ");
                     string brand = Console.ReadLine();
@@ -79,8 +82,8 @@ class Program
                     Console.Write("Introduceti stocul initial al telefonului: ");
                     int stoc = int.Parse(Console.ReadLine());
 
-                    // Create a new phone object and add it to the shop
-                    Telefon newPhone = new Telefon(id, brand, model, pret, descriere, stoc);
+                    // Creaza un nou obiect telefon și il adauga în magazin
+                    Telefon newPhone = new Telefon( brand, model, pret, descriere, stoc);
                     shop.Adauga_Telefon(newPhone);
 
                     Console.WriteLine($"Telefonul {newPhone.Brandul} {newPhone.Model} a fost adaugat cu succes.");
@@ -99,23 +102,23 @@ class Program
 
                     // Display the available phones
                     List<Telefon> pTelefon = shop.GetTelefoane();
-                    Console.WriteLine("ID  | Brand  | Model  | Pret  | Descriere  | Stoc");
+                    Console.WriteLine("Brand  | Model  | Pret  | Descriere  | Stoc");
                     foreach (Telefon phone in pTelefon)
                     {
-                        Console.WriteLine($"{phone.Id}  | {phone.Brandul}  | {phone.Model}  | {phone.Pret}  | {phone.Descriere}  | {phone.Stoc}");
+                        Console.WriteLine($"{phone.Brandul}  | {phone.Model}  | {phone.Pret}  | {phone.Descriere}  | {phone.Stoc}");
                     }
 
                     // Prompt the user to enter the phone ID and quantity
                     Console.Write("Introduceti ID-ul telefonului: ");
-                    int phoneId = int.Parse(Console.ReadLine());
+                    string phoneBrand = Console.ReadLine();
                     Console.Write("Introduceti cantitatea: ");
                     int quantity = int.Parse(Console.ReadLine());
 
                     // Check if the requested phone is available
-                    Telefon selectedPhone = pTelefon.FirstOrDefault(p => p.Id == phoneId);
+                    Telefon selectedPhone = pTelefon.FirstOrDefault(p => p.Brandul == phoneBrand);
                     if (selectedPhone == null)
                     {
-                        Console.WriteLine($"Nu s-a gasit niciun telefon cu ID-ul {phoneId}.");
+                        Console.WriteLine($"Nu s-a gasit niciun telefon cu Brandul {phoneBrand}.");
                         break;
                     }
                     if (selectedPhone.Stoc < quantity)
@@ -177,6 +180,7 @@ class Program
                     Console.WriteLine("Optiune invalida.");
                     break;
             }
+            
         }
 
 
