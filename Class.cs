@@ -7,16 +7,16 @@ using Newtonsoft.Json;
 
 public class Telefon
 {
-    public int Id { get; set; }
+    
     public string Brandul { get; set; }
     public string Model { get; set; }
     public decimal Pret { get; set; }
     public string Descriere { get; set; }
     public int Stoc { get; set; }
 
-    public Telefon(int id, string brand, string model, decimal pret, string descriere, int stoc)//constructor al clasei telefon
+    public Telefon( string brand, string model, decimal pret, string descriere, int stoc)//constructor al clasei telefon
     {
-        Id = id;
+        
         Brandul = brand;
         Model = model;
         Pret = pret;
@@ -86,11 +86,11 @@ public class MagazinulDeTelefoaneMobile
     {
         telefoane.Add(telefon);
 
-        // Open the file in append mode
+        // Deschide fișierul în modul append
         using (StreamWriter file = new StreamWriter("C:/Users/Asus/Desktop/telefoane.txt", true))
         {
-            // Write the phone data to the file
-            file.WriteLine($"{telefon.Id}, {telefon.Brandul}, {telefon.Model}, {telefon.Pret}, {telefon.Descriere}, {telefon.Stoc}");
+            // Scrie datele telefonului in fisier
+            file.WriteLine($" {telefon.Brandul}, {telefon.Model}, {telefon.Pret}, {telefon.Descriere}, {telefon.Stoc}");
         }
     }
 
@@ -100,9 +100,10 @@ public class MagazinulDeTelefoaneMobile
     {
         clienti.Add(client);
 
-        // Serialize the list of clients to a file
+        // Deschide fișierul în modul append
         using (StreamWriter file = new StreamWriter("C:/Users/Asus/Desktop/clienti.txt"))
         {
+            // Scrie datele clientului in fisier
             file.WriteLine($"{client.Nume}, {client.Email}, {client.Adresa}, {client.Comenzi}");
         }
 
@@ -114,11 +115,14 @@ public class MagazinulDeTelefoaneMobile
     {
         using (StreamReader sr = new StreamReader(@"C:/Users/Asus/Desktop/clienti.txt"))
         {
+            //citeste din fisier pana la sfarsit
             while (!sr.EndOfStream)
             {
+                //citeste prima linie
                 string line = sr.ReadLine();
+                // ','este luat ca un despartitor
                 string[] fields = line.Split(',');
-
+                //preia datele in functie de pozitia lor in fisier luand in calcul si despartitorul 
                 string nume = fields[0].Trim();
                 string emailFile = fields[1].Trim();
                 string adresa = fields[2].Trim();
@@ -153,7 +157,7 @@ public class MagazinulDeTelefoaneMobile
         {
             clienti.Remove(client);
 
-            // Serialize the updated list of clients to a file
+            // Serializeaza lista actualizată de clienți într-un fișier
             string json = JsonConvert.SerializeObject(clienti, Formatting.Indented);
             File.WriteAllText("clienti.json", json);
 
@@ -174,19 +178,22 @@ public class MagazinulDeTelefoaneMobile
 
         using (StreamReader sr = new StreamReader(@"C:/Users/Asus/Desktop/telefoane.txt"))
         {
+            //citeste din fisier pana la sfarsit
             while (!sr.EndOfStream)
             {
+                //citeste prima linie
                 string line = sr.ReadLine();
+                // ','este luat ca un despartitor
                 string[] fields = line.Split(',');
+                //preia datele in functie de pozitia lor in fisier luand in calcul si despartitorul 
+                
+                string brand = fields[0].Trim();
+                string model = fields[1].Trim();
+                decimal pret = decimal.Parse(fields[2].Trim());
+                string descriere = fields[3].Trim();
+                int stoc = int.Parse(fields[4].Trim());
 
-                int id = int.Parse(fields[0].Trim());
-                string brand = fields[1].Trim();
-                string model = fields[2].Trim();
-                decimal pret = decimal.Parse(fields[3].Trim());
-                string descriere = fields[4].Trim();
-                int stoc = int.Parse(fields[5].Trim());
-
-                Telefon telefon = new Telefon(id, brand, model, pret, descriere, stoc);
+                Telefon telefon = new Telefon( brand, model, pret, descriere, stoc);
                 telefoane.Add(telefon);
             }
         }
