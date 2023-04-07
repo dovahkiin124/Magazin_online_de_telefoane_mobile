@@ -5,6 +5,14 @@ using System.IO;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 
+public enum reteadetelefonie
+{
+    Telecom,
+    Orange,
+    Digi,
+    Vodafone
+}
+
 public class Telefon
 {
     
